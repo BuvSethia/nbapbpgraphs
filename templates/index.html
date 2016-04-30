@@ -14,32 +14,37 @@
 	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   </head>
   <body>
-	<div class="row">
-		<h1 style="text-align: center; padding-bottom: 10px;">Play By Play Graphs</h1>
-	</div>
-	<div class="row">
-		<div class="col-sm-6" style="padding-left: 25px;">
-			<form class="form-inline">
-				<label for="date">Date:</label>
-				<input type="text" class="form-control" id="date" placeholder="mm-dd-yyyy">
-				<button type="submit" class="btn btn-primary" onclick="getGamesForDate()">Enter</button>
-			</form>
+  	<div ng-app="mainApp" ng-controller="mainController">
+		<div class="row">
+			<h1 style="text-align: center; padding-bottom: 10px;">Play By Play Graphs</h1>
 		</div>
-		<div class="col-sm-4">
-			<select name="games" hidden>
-
-			</select>
+		<div class="row">
+			<div class="col-sm-5" id="dateInput" style="padding-left: 25px;">
+				<form class="form-inline">
+					<label for="date">Date:</label>
+					<input type="text" class="form-control" id="date" name="date" ng-model="gamedate" placeholder="mm-dd-yyyy">
+					<button type="submit" class="btn btn-primary" ng-click="getGamesForDate(gamedate)">Enter</button>
+					<p ng-model="gameSelHelpText"></p>
+				</form>
+			</div>
+			<div class="col-sm-5" id="gameSelect">
+				<label for="gameSelector">Select Game</label>
+				<select id="gameSelector" ng-model="gameMetadata" ng-options="item.id as item.name for item in gameMetadata">
+    				<option value="">Select Game</option>
+				</select>
+			</div>
+			<div class="col-sm-2">
+			</div>
 		</div>
-		<div class="col-sm-2">
+		<hr>
+		<div class="row">
+		  <div class="col-sm-2">Menu goes here</div>
+		  <div class="col-sm-10">
+			<canvas id="myChart"></canvas>
+		  </div>
 		</div>
 	</div>
-	<hr>
-	<div class="row">
-	  <div class="col-sm-2">Menu goes here</div>
-	  <div class="col-sm-10">
-		<canvas id="myChart"></canvas>
-	  </div>
-	</div>
+  	<script src="/static/appjs/index.js"></script>
   </body>
 </html>
 

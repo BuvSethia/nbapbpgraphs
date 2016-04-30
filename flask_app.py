@@ -29,12 +29,12 @@ def games_for_date(date):
 
     #Get the relevant rows
     row_set = result['resultSets'][0]['rowSet']
-    games = dict()
+    games = list()
     for row in row_set:
         game_id = row[2]
         name = str(row[5]).split('/')[1]
         name_formatted = name[:3] + '@' + name[3:]
-        games[name_formatted] = game_id
+        games.append({'name': name_formatted, 'id': game_id})
 
 
     return jsonify(result='Success', gameList=games)

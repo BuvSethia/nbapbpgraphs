@@ -9,12 +9,23 @@ app.controller("mainController", function($scope, $http) {
         console.log(date);
         var games = $http.get("/games/" + date);
         games.success(function (data, status, headers, config) {
-            console.log(data['gameList']);
-            $scope.gameMetadata = data['gameList'];
-            $scope.gameSelHelpText = "Games found. Please select one.";
+            if(data['result'] === "Success")
+            {
+                console.log(data['gameList']);
+                $scope.gameMetadata = data['gameList'];
+                $scope.gameSelHelpText = "Games found. Please select one.";
+            }
+            else
+            {
+                $scope.gameSelHelpText = "Games not found for date. Ensure valid date is input as mm-dd-yyyy.";
+            }
         });
         games.error(function () {
             $scope.gameSelHelpText = "There was an error obtaining the games for the specified date. Please try again later.";
         });
     };
+    $scope.loadChecklists = function(game)
+    {
+        alert(game['name']);
+    }
 });

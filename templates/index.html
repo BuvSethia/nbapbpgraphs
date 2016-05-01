@@ -24,12 +24,12 @@
 					<label for="date">Date:</label>
 					<input type="text" class="form-control" id="date" name="date" ng-model="gamedate" placeholder="mm-dd-yyyy">
 					<button type="submit" class="btn btn-primary" ng-click="getGamesForDate(gamedate)">Enter</button>
-					<p ng-model="gameSelHelpText"></p>
 				</form>
+				<p ng-bind="gameSelHelpText"></p>
 			</div>
 			<div class="col-sm-5" id="gameSelect">
 				<label for="gameSelector">Select Game</label>
-				<select id="gameSelector" ng-model="gameMetadata" ng-options="item.id as item.name for item in gameMetadata">
+				<select id="gameSelector" ng-model="selectedGame" ng-change="loadChecklists(selectedGame)" ng-options="item as item.name for item in gameMetadata">
     				<option value="">Select Game</option>
 				</select>
 			</div>
@@ -44,16 +44,11 @@
 		  </div>
 		</div>
 	</div>
-  	<script src="/static/appjs/index.js"></script>
+  	<script src="/static/app/index.js"></script>
   </body>
 </html>
 
 <script>
-	function getGamesForDate()
-	{
-		var date = document.getElementById('date').value
-
-	}
 	function createGraph(){
 		//Chart.defualts.global.responsive = false;
 		//Chart.defualts.global.maintainAspectRatio = false;

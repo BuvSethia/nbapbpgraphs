@@ -52,9 +52,27 @@
 			  </div>
 		  	</div>
 		  <div class="col-sm-8">
-			  <button type="submit" class="btn btn-primary" ng-click="printSelected()">Enter</button>
 			  <canvas id="myChart"></canvas>
 		  </div>
+		</div>
+		<div class="row">
+			<div class="col-sm-2" style="padding-left: 25px; padding-top: 25px;">
+				<label for="statSelector">Stat</label>
+				<select id="statSelector" ng-model="selectedStat">
+					<option value="PTS">PTS</option>
+					<option value="OREB">OREB</option>
+					<option value="DREB">DREB</option>
+					<option value="TREB">TREB</option>
+					<option value="AST">AST</option>
+					<option value="PF">PF</option>
+					<option value="STL">STL</option>
+					<option value="TO">TO</option>
+					<option value="BS">BS</option>
+				</select>
+			</div>
+			<div class="col-sm-2" style="padding-top: 25px;">
+				<button type="submit" class="btn btn-primary" ng-click="printSelected()">Create Graph</button>
+			</div>
 		</div>
 	</div>
   </body>

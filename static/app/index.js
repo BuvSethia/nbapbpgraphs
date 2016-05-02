@@ -5,7 +5,7 @@ app.controller("mainController", function($scope, $http) {
     $scope.gameMetadata = [];
     $scope.gameSelHelpText = "";
     $scope.selectedPlayers = [];
-    
+
     $scope.getGamesForDate = function(date)
     {
         console.log(date);

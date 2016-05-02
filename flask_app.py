@@ -4,6 +4,7 @@ from flask import Flask
 from flask import jsonify
 from flask import render_template
 from nba_info.teams import All_TEAMS
+from nba_info.nba_requests import  make_request
 import requests
 
 app = Flask(__name__)
@@ -16,14 +17,8 @@ def home_page():
 def games_for_date(date):
     #Get the result from nba.com
     url = 'http://stats.nba.com/stats/scoreboard?DayOffset=0&LeagueID=00&GameDate=' + date
-    #BORROWED FROM seemsthere's nba_py
-    headers = {'user-agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) '
-                              'AppleWebKit/537.36 (KHTML, like Gecko) '
-                              'Chrome/45.0.2454.101 Safari/537.36'),
-               'referer': 'http://stats.nba.com/scores/'
-            }
-    r = requests.get(url, headers=headers)
     try:
+        r = make_request(url)
         result = r.json()
         #Get the relevant rows
         row_set = result['resultSets'][0]['rowSet']
@@ -41,7 +36,27 @@ def games_for_date(date):
 # TODO: implement get_roster function
 @app.route('/roster/<string:team>')
 def get_roster(team):
-    pass
+    #Get the result from nba.com
+    url = 'http://stats.nba.com/stats/commonteamroster?Season=2015-16&TeamID=' + (All_TEAMS[team])['id']
+    try:
+        r = make_request(url)
+        result = r.json()
+        #Get the relevant rows
+        row_set = result['resultSets'][0]['rowSet']
+        players = dict()
+        for row in row_set:
+            '''
+            team_id = row[0]
+            name = row[3]
+            number = row[4]
+            position = row[5]
+            player_id = row[12]
+            '''
+            players[row[3]] = {'teamID': row[0], 'playerID': row[12], 'number': row[4], 'position': row[5]}
+
+        return jsonify(result='Success', roster=players)
+    except:
+        return jsonify(result='Error')
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -12,6 +12,8 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 	<!-- Latest compiled JavaScript -->
 	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<script src='/static/js/checklist-model.js'></script>
+	<script src="/static/app/index.js"></script>
   </head>
   <body>
   	<div ng-app="mainApp" ng-controller="mainController">
@@ -30,7 +32,6 @@
 			<div class="col-sm-5" id="gameSelect">
 				<label for="gameSelector">Select Game</label>
 				<select id="gameSelector" ng-model="selectedGame" ng-change="loadChecklists(selectedGame)" ng-options="item as item.name for item in gameMetadata">
-    				<option value="">Select Game</option>
 				</select>
 			</div>
 			<div class="col-sm-2">
@@ -38,20 +39,31 @@
 		</div>
 		<hr>
 		<div class="row">
-		  <div class="col-sm-2">Menu goes here</div>
-		  <div class="col-sm-10">
-			<canvas id="myChart"></canvas>
+		  <div class="col-sm-2" style="padding-left: 25px;">
+			  <div ng-repeat="(key, value) in awayRoster">
+				  <input type="checkbox" checklist-model="selectedPlayers" checklist-value="key"> <label ng-bind="key"></label>
+				  <br/>
+			  </div>
+		  </div>
+			<div class="col-sm-2">
+			  <div ng-repeat="(key, value) in homeRoster">
+				  <input type="checkbox" checklist-model="selectedPlayers" checklist-value="key"> <label ng-bind="key"></label>
+				  <br/>
+			  </div>
+		  	</div>
+		  <div class="col-sm-8">
+			  <button type="submit" class="btn btn-primary" ng-click="printSelected()">Enter</button>
+			  <canvas id="myChart"></canvas>
 		  </div>
 		</div>
 	</div>
-  	<script src="/static/app/index.js"></script>
   </body>
 </html>
 
 <script>
 	function createGraph(){
-		//Chart.defualts.global.responsive = false;
-		//Chart.defualts.global.maintainAspectRatio = false;
+		//Chart.defaults.global.responsive = false;
+		//Chart.defaults.global.maintainAspectRatio = false;
 		var data = {
 			labels: [moment("00:00","mm:ss"), moment("00:01","mm:ss"), moment("00:02","mm:ss"), moment("00:04","mm:ss"), moment("00:10","mm:ss"), moment("00:15","mm:ss"), moment("00:59","mm:ss")],
 			datasets: [

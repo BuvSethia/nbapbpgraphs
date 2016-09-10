@@ -1,2 +1,2 @@
-<h1>nbapbpgraphs<h1>
-Create graphs from NBA.com's play by plays
+<title>nbapbpgraphs</title>
+<p>Create graphs from NBA.com's play by plays</p>

@@ -1,13 +1,14 @@
-# A very simple Flask Hello World app for you to get started with...
-
 from flask import Flask
 from flask import jsonify
 from flask import render_template
+
 from nba_info.teams import All_TEAMS
-from nba_info.nba_requests import  make_request
-import requests
+from nba_info.nba_requests import *
+from nba_info.graph_data_generators.graph_data_generator_pts import generate_data_pts
 
 app = Flask(__name__)
+
+# TODO - For all methods, transfer the logic to nba_requests.py to abstract logic from REST API.
 
 @app.route('/')
 def home_page():
@@ -33,7 +34,7 @@ def games_for_date(date):
     except:
         return jsonify(result='Error')
 
-# TODO: implement get_roster function
+# TODO: Currently only works for 2015-16 season. Use date ranges to make work for all seasons
 @app.route('/roster/<string:team>')
 def get_roster(team):
     #Get the result from nba.com
@@ -57,6 +58,23 @@ def get_roster(team):
         return jsonify(result='Success', roster=players)
     except:
         return jsonify(result='Error')
+
+@app.route('/team/fullname/<string:abbr>')
+def get_full_name(abbr):
+    return All_TEAMS[abbr]['name']
+
+@app.route('/graphdata/<string:gameid>/<string:stat>/<string:home>/<string:away>')
+def create_graph_data_for_players_and_stat(gameid, stat, home, away):
+    url = 'http://stats.nba.com/stats/playbyplay?GameID=' + gameid + '&StartPeriod=1&EndPeriod=4'
+    r = make_request(url)
+    result = r.json()
+    #Get the relevant rows
+    row_set = result['resultSets'][0]['rowSet']
+
+    if stat == "PTS":
+        return generate_data_pts(home, away, row_set)
+    else:
+        return 'Magical edge case that should never be reached ' + stat
 
 if __name__ == '__main__':
     app.run(debug=True)

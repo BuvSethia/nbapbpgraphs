@@ -16,18 +16,17 @@
 	<script src="/static/app/index.js"></script>
   </head>
   <body>
-  	<div ng-app="mainApp" ng-controller="mainController">
+  	<div ng-app="mainApp" ng-controller="mainController" class="container-fluid">
 		<div class="row">
 			<h1 style="text-align: center; padding-bottom: 10px;">Play By Play Graphs</h1>
 		</div>
 		<div class="row">
-			<div class="col-sm-5" id="dateInput" style="padding-left: 25px;">
+			<div class="col-sm-5" id="dateInput" >
 				<form class="form-inline">
 					<label for="date">Date:</label>
 					<input type="text" class="form-control" id="date" name="date" ng-model="gamedate" placeholder="mm-dd-yyyy">
 					<button type="submit" class="btn btn-primary" ng-click="getGamesForDate(gamedate)">Enter</button>
 				</form>
-				<p ng-bind="gameSelHelpText"></p>
 			</div>
 			<div class="col-sm-5" id="gameSelect">
 				<label for="gameSelector">Select Game</label>
@@ -37,25 +36,34 @@
 			<div class="col-sm-2">
 			</div>
 		</div>
+		<div class="row" style="padding-left: 25px;">
+			<p ng-bind="gameSelHelpText"></p>
+		</div>
 		<hr>
-		<div class="row">
+		<div class="row" ng-hide="hide">
 		  <div class="col-sm-2" style="padding-left: 25px;">
+			  <h3><strong ng-bind="awayTeam"></strong></h3><br/>
 			  <div ng-repeat="(key, value) in awayRoster">
-				  <input type="checkbox" checklist-model="selectedPlayers" checklist-value="key"> <label ng-bind="key"></label>
+				  <input type="checkbox" checklist-model="selectedPlayersAway" checklist-value="key"> <label ng-bind="key"></label>
 				  <br/>
 			  </div>
+			  <input type="checkbox" checklist-model="selectedPlayersAway" checklist-value="awayTeamChecklist"> <label ng-bind="awayTeamChecklist"></label>
+			  <br/>
 		  </div>
 			<div class="col-sm-2">
+			  <h3><strong ng-bind="homeTeam"></strong></h3><br/>
 			  <div ng-repeat="(key, value) in homeRoster">
-				  <input type="checkbox" checklist-model="selectedPlayers" checklist-value="key"> <label ng-bind="key"></label>
+				  <input type="checkbox" checklist-model="selectedPlayersHome" checklist-value="key"> <label ng-bind="key"></label>
 				  <br/>
 			  </div>
-		  	</div>
+			  <input type="checkbox" checklist-model="selectedPlayersHome" checklist-value="homeTeamChecklist"> <label ng-bind="homeTeamChecklist"></label>
+			  <br/>
+		  </div>
 		  <div class="col-sm-8">
 			  <canvas id="myChart"></canvas>
 		  </div>
 		</div>
-		<div class="row">
+		<div class="row" ng-hide="hide">
 			<div class="col-sm-2" style="padding-left: 25px; padding-top: 25px;">
 				<label for="statSelector">Stat</label>
 				<select id="statSelector" ng-model="selectedStat">
@@ -71,7 +79,7 @@
 				</select>
 			</div>
 			<div class="col-sm-2" style="padding-top: 25px;">
-				<button type="submit" class="btn btn-primary" ng-click="printSelected()">Create Graph</button>
+				<button type="submit" class="btn btn-primary" ng-click="generateGraphData(selectedPlayersHome, selectedPlayersAway, selectedStat)">Create Graph</button>
 			</div>
 		</div>
 	</div>

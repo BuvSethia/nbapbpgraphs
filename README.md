@@ -4,3 +4,7 @@
 <h3>Server Side:</h3>
 <li>Python 2.7</li>
 <li>Flask</li>
+<h3>Front End:</h3>
+<li>Angular 1.4.8</li>
+<li>Bootstrap 3.3.6</li>
+<li>jQuery 1.12.0 (for Bootstrap)</li>

@@ -8,3 +8,5 @@
 <li>Angular 1.4.8</li>
 <li>Bootstrap 3.3.6</li>
 <li>jQuery 1.12.0 (for Bootstrap)</li>
+<h3>IDE</h3>
+<li>PyCharm</li>

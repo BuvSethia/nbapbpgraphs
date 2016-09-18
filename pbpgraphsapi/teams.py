@@ -1,5 +1,7 @@
 __author__ = 'Sumbhav'
 
+#TODO LOW PRIORITY - Add support for All-Star game rosters
+
 All_TEAMS = {
     'ATL': {
         'abbreviation': 'ATL',

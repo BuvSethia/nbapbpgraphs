@@ -1,3 +1,5 @@
+//TODO - Clean up frontend code. Consider splitting into multiple controllers and maybe using services/factories for data parsing. Directives maybe?
+
 var app = angular.module("mainApp", ["checklist-model"]);
 
 app.controller("mainController", function($scope, $http) {
@@ -15,7 +17,7 @@ app.controller("mainController", function($scope, $http) {
     $scope.hide = true;
 
     //Get games that occur on user provided date
-    //TODO: Validate date given
+    //TODO HIGH PRIORITY - Validate date given
     $scope.getGamesForDate = function(date)
     {
         console.log(date);
@@ -53,7 +55,7 @@ app.controller("mainController", function($scope, $http) {
         //0 is away team, 1 is home team
         var teams = game['name'].split("@");
 
-        //TODO - Better error messages
+        //TODO MEDIUM PRIORITY - Better error messages
         $http.get("/roster/" + teams[0]).success(function (data, status, headers, config) {
             if(data['result'] === "Success") $scope.awayRoster = data['roster']
             else alert("Error obtaining roster data for" + teams[0]);
@@ -95,8 +97,7 @@ app.controller("mainController", function($scope, $http) {
 
     $scope.generateGraphData = function(chosenPlayersHome, chosenPlayersAway, chosenStat)
     {
-        //TODO - Fix error with chosen stat check not recognizing null chosen stat
-        if(chosenStat === "" || chosenStat === null || (chosenPlayersHome.length === 0 && chosenPlayersAway.length === 0))
+        if(!chosenStat || (chosenPlayersHome.length === 0 && chosenPlayersAway.length === 0))
         {
             alert("Please select a stat AND players to graph");
         }
@@ -109,15 +110,13 @@ app.controller("mainController", function($scope, $http) {
             var homePlayers = "NOPLAYERS";
             if(chosenPlayersHome.length != 0)
             {
-                //homePlayers = encodeURIComponent(chosenPlayersHome.join('_'));
-                homePlayers = generatePlayersString(chosenPlayersHome, Object.keys($scope.homeRoster));
+                homePlayers = generatePlayersString(chosenPlayersHome.slice(0), Object.keys($scope.homeRoster));
             }
 
             var awayPlayers = "NOPLAYERS";
             if(chosenPlayersAway.length != 0)
             {
-                //awayPlayers = encodeURIComponent(chosenPlayersAway.join('_'));
-                awayPlayers = generatePlayersString(chosenPlayersAway, Object.keys($scope.awayRoster));
+                awayPlayers = generatePlayersString(chosenPlayersAway.slice(0), Object.keys($scope.awayRoster));
             }
 
             $http.get("/graphdata/" + $scope.selectedGame['id'] + "/" + chosenStat + "/" + homePlayers + "/" + awayPlayers).success(function (data, status, headers, config) {
@@ -129,12 +128,13 @@ app.controller("mainController", function($scope, $http) {
 
         }
 
-        //Join names together while also identifying players who share a common last name with a teammate
+        //Join names together to pass to API endpoint while also identifying players who share a common last name with a teammate
+        //TODO LOW PRIORITY - Consider moving this to the backend and making an extra API call to get the full roster to fully separate frontend and backend
         function generatePlayersString(chosenPlayersList, fullRoster){
             //console.log("Length of full roster: " + fullRoster.length);
             for(var i = 0; i < chosenPlayersList.length; i++){
                 for(var j = 0; j < fullRoster.length; j++){
-                    console.log(chosenPlayersList[i] + ' ' + fullRoster[j] + " ===> " + fullRoster[j].indexOf(chosenPlayersList[i].split(' ')[1]))
+                    //console.log(chosenPlayersList[i] + ' ' + fullRoster[j] + " ===> " + fullRoster[j].indexOf(chosenPlayersList[i].split(' ')[1]))
                     if(chosenPlayersList[i] != fullRoster[j] && fullRoster[j].indexOf(chosenPlayersList[i].split(' ')[1]) > -1){
                         //console.log(chosenPlayersList[i] + " shares the same last name as " + fullRoster[j]);
                         if(chosenPlayersList[i].indexOf("sharedlast") < 0){
@@ -145,7 +145,7 @@ app.controller("mainController", function($scope, $http) {
                 }
             }
 
-            console.log("Chosen players modded: " + chosenPlayersList);
+            //console.log("Chosen players modded: " + chosenPlayersList);
             return encodeURIComponent(chosenPlayersList.join('_'));
         }
     }

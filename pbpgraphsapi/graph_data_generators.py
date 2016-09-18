@@ -39,13 +39,13 @@ def generate_data_pts(home, away, row_set):
                         print desc
                         home_score = int(row[_SCORE].split(" - ")[1])
                         print str(home_score)
-                        # PTS BEING EXTRACTED NOW ADD THEM TO DATASET
+                        # PTS BEING EXTRACTED NOW ADD THEM TO DATASET - CONTINUE HERE
                     elif pbp_name in desc and not ("(" + pbp_name) in desc:
                         print desc
                         try:
                             pts = int(re.search("\((.+?) PTS", desc).group(1))
                             print str(pts)
-                            # PTS BEING EXTRACTED NOW ADD THEM TO DATASET
+                            # PTS BEING EXTRACTED NOW ADD THEM TO DATASET - CONTINUE HERE
                         except AttributeError:
                             print "Could not find a value. Ignoring this pbp statement."
                     else:

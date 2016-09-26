@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!-- TODO LOW PRIORITY - Add comments at some point -->
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
+<head>
+	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 	<script src="/static/js/moment.js"></script>
@@ -12,76 +12,77 @@
 	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 	<script src='/static/js/checklist-model.js'></script>
 	<script src="/static/app/index.js"></script>
-  </head>
-  <body>
-  	<div ng-app="mainApp" ng-controller="mainController" class="container-fluid">
-		<div class="row">
-			<h1 style="text-align: center; padding-bottom: 10px;">Play By Play Graphs</h1>
+	<script src="/static/app/chartconfighelpers.js"></script>
+</head>
+<body>
+<div ng-app="mainApp" ng-controller="mainController" class="container-fluid">
+	<div class="row">
+		<h1 style="text-align: center; padding-bottom: 10px;">Play By Play Graphs</h1>
+	</div>
+	<div class="row col-sm-12">
+		<div class="col-sm-5" id="dateInput" >
+			<form class="form-inline">
+				<label for="date">Date:</label>
+				<input type="text" class="form-control" id="date" name="date" ng-model="gamedate" placeholder="mm-dd-yyyy">
+				<button type="submit" class="btn btn-primary" ng-click="getGamesForDate(gamedate)">Enter</button>
+			</form>
 		</div>
-		<div class="row col-sm-12">
-			<div class="col-sm-5" id="dateInput" >
-				<form class="form-inline">
-					<label for="date">Date:</label>
-					<input type="text" class="form-control" id="date" name="date" ng-model="gamedate" placeholder="mm-dd-yyyy">
-					<button type="submit" class="btn btn-primary" ng-click="getGamesForDate(gamedate)">Enter</button>
-				</form>
+		<div class="col-sm-5" id="gameSelect">
+			<label for="gameSelector">Select Game</label>
+			<select id="gameSelector" ng-model="selectedGame" ng-change="loadChecklists(selectedGame)" ng-options="item as item.name for item in gameMetadata">
+			</select>
+		</div>
+		<div class="col-sm-2"></div>
+	</div>
+	<!-- TODO LOW PRIORITY - Convert to boostrap alert -->
+	<div class="row col-sm-12">
+		<p ng-bind="gameSelHelpText"></p>
+		<hr/>
+	</div>
+	<div class="data-gen-selectors">
+		<div class="row" ng-hide="hide">
+			<div class="col-sm-2" style="padding-left: 25px;">
+				<h3><strong ng-bind="awayTeam"></strong></h3><br/>
+				<div ng-repeat="(key, value) in awayRoster">
+					<input type="checkbox" checklist-model="selectedPlayersAway" checklist-value="key"> <label ng-bind="key"></label>
+					<br/>
+				</div>
+				<input type="checkbox" checklist-model="selectedPlayersAway" checklist-value="awayTeamChecklist"> <label ng-bind="awayTeamChecklist"></label>
+				<br/>
 			</div>
-			<div class="col-sm-5" id="gameSelect">
-				<label for="gameSelector">Select Game</label>
-				<select id="gameSelector" ng-model="selectedGame" ng-change="loadChecklists(selectedGame)" ng-options="item as item.name for item in gameMetadata">
+			<div class="col-sm-2">
+				<h3><strong ng-bind="homeTeam"></strong></h3><br/>
+				<div ng-repeat="(key, value) in homeRoster">
+					<input type="checkbox" checklist-model="selectedPlayersHome" checklist-value="key"> <label ng-bind="key"></label>
+					<br/>
+				</div>
+				<input type="checkbox" checklist-model="selectedPlayersHome" checklist-value="homeTeamChecklist"> <label ng-bind="homeTeamChecklist"></label>
+				<br/>
+			</div>
+			<div class="col-sm-8">
+				<canvas id="myChart"></canvas>
+			</div>
+		</div>
+		<div class="row" ng-hide="hide">
+			<div class="col-sm-2" style="padding-left: 25px; padding-top: 25px;">
+				<label for="statSelector">Stat</label>
+				<select id="statSelector" ng-model="selectedStat" ng-init="''">
+					<option value="PTS">PTS</option>
+					<option value="OREB">OREB</option>
+					<option value="DREB">DREB</option>
+					<option value="TREB">TREB</option>
+					<option value="AST">AST</option>
+					<option value="PF">PF</option>
+					<option value="STL">STL</option>
+					<option value="TO">TO</option>
+					<option value="BS">BS</option>
 				</select>
 			</div>
-			<div class="col-sm-2"></div>
-		</div>
-		<!-- TODO LOW PRIORITY - Convert to boostrap alert -->
-		<div class="row col-sm-12">
-			<p ng-bind="gameSelHelpText"></p>
-			<hr/>
-		</div>
-		<div class="data-gen-selectors">
-			<div class="row" ng-hide="hide">
-			  <div class="col-sm-2" style="padding-left: 25px;">
-				  <h3><strong ng-bind="awayTeam"></strong></h3><br/>
-				  <div ng-repeat="(key, value) in awayRoster">
-					  <input type="checkbox" checklist-model="selectedPlayersAway" checklist-value="key"> <label ng-bind="key"></label>
-					  <br/>
-				  </div>
-				  <input type="checkbox" checklist-model="selectedPlayersAway" checklist-value="awayTeamChecklist"> <label ng-bind="awayTeamChecklist"></label>
-				  <br/>
-			  </div>
-				<div class="col-sm-2">
-				  <h3><strong ng-bind="homeTeam"></strong></h3><br/>
-				  <div ng-repeat="(key, value) in homeRoster">
-					  <input type="checkbox" checklist-model="selectedPlayersHome" checklist-value="key"> <label ng-bind="key"></label>
-					  <br/>
-				  </div>
-				  <input type="checkbox" checklist-model="selectedPlayersHome" checklist-value="homeTeamChecklist"> <label ng-bind="homeTeamChecklist"></label>
-				  <br/>
-			  </div>
-			  <div class="col-sm-8">
-				  <canvas id="myChart"></canvas>
-			  </div>
-			</div>
-			<div class="row" ng-hide="hide">
-				<div class="col-sm-2" style="padding-left: 25px; padding-top: 25px;">
-					<label for="statSelector">Stat</label>
-					<select id="statSelector" ng-model="selectedStat" ng-init="''">
-						<option value="PTS">PTS</option>
-						<option value="OREB">OREB</option>
-						<option value="DREB">DREB</option>
-						<option value="TREB">TREB</option>
-						<option value="AST">AST</option>
-						<option value="PF">PF</option>
-						<option value="STL">STL</option>
-						<option value="TO">TO</option>
-						<option value="BS">BS</option>
-					</select>
-				</div>
-				<div class="col-sm-2" style="padding-top: 25px;">
-					<button type="submit" class="btn btn-primary" ng-click="generateGraphData(selectedPlayersHome, selectedPlayersAway, selectedStat)">Create Graph</button>
-				</div>
+			<div class="col-sm-2" style="padding-top: 25px;">
+				<button type="submit" class="btn btn-primary" ng-click="generateGraphData(selectedPlayersHome, selectedPlayersAway, selectedStat)">Create Graph</button>
 			</div>
 		</div>
 	</div>
-  </body>
+</div>
+</body>
 </html>

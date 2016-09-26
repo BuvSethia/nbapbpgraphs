@@ -1,4 +1,7 @@
-//TODO - Clean up frontend code. Consider splitting into multiple controllers and maybe using services/factories for data parsing. Directives maybe?
+// TODO - Clean up frontend code. Consider splitting into multiple controllers and maybe using services/factories for data parsing. Directives maybe?
+// TODO - Auto-refresh graph
+// TODO HIGHEST PRIORITY - GRAPH REFRESH ERROR
+// TODO HIGHEST PRIORITY - Same last name checker also matching first names with last names (ie. Paul George and George Hill)
 
 var app = angular.module("mainApp", ["checklist-model"]);
 
@@ -120,7 +123,11 @@ app.controller("mainController", function($scope, $http) {
             }
 
             $http.get("/graphdata/" + $scope.selectedGame['id'] + "/" + chosenStat + "/" + homePlayers + "/" + awayPlayers).success(function (data, status, headers, config) {
-                alert(data);
+                //window.myLine = null;
+                addColorOptionsToChart(data);
+                console.log(data);
+                var ctx = document.getElementById("myChart").getContext("2d");
+			    window.myLine = new Chart(ctx, data);
             })
             .error(function () {
                 alert("There was an error reaching the server. Yay.");

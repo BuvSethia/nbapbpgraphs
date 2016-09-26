@@ -33,6 +33,7 @@ def games_for_date(date):
 
 # TODO HIGH PRIORITY - Currently only works for 2015-16 season. Use date ranges to make work for all seasons
 # TODO LOW PRIORITY - Modify to make this endpoint work for the All-Star teams as well
+# TODO MEDIUM PRIORITY - Modify this to account for mid-season trades somehow
 @app.route('/roster/<string:team>')
 def get_roster(team):
     #Get the result from nba.com

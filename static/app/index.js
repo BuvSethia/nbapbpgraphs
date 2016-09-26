@@ -123,7 +123,7 @@ app.controller("mainController", function($scope, $http) {
             }
 
             $http.get("/graphdata/" + $scope.selectedGame['id'] + "/" + chosenStat + "/" + homePlayers + "/" + awayPlayers).success(function (data, status, headers, config) {
-                //window.myLine = null;
+                window.myLine = null;
                 addColorOptionsToChart(data);
                 console.log(data);
                 var ctx = document.getElementById("myChart").getContext("2d");
@@ -142,8 +142,8 @@ app.controller("mainController", function($scope, $http) {
             for(var i = 0; i < chosenPlayersList.length; i++){
                 for(var j = 0; j < fullRoster.length; j++){
                     //console.log(chosenPlayersList[i] + ' ' + fullRoster[j] + " ===> " + fullRoster[j].indexOf(chosenPlayersList[i].split(' ')[1]))
-                    if(chosenPlayersList[i] != fullRoster[j] && fullRoster[j].indexOf(chosenPlayersList[i].split(' ')[1]) > -1){
-                        //console.log(chosenPlayersList[i] + " shares the same last name as " + fullRoster[j]);
+                    if(chosenPlayersList[i] != fullRoster[j] && fullRoster[j].split(' ')[1] == chosenPlayersList[i].split(' ')[1]){
+                        console.log(chosenPlayersList[i] + " shares the same last name as " + fullRoster[j]);
                         if(chosenPlayersList[i].indexOf("sharedlast") < 0){
                             chosenPlayersList[i] = "sharedlast" + chosenPlayersList[i];
                             break;

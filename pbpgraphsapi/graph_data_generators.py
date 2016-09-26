@@ -16,13 +16,14 @@ NOTES - Right now, the easiest (but probably least efficient) way of generating 
 '''
 
 # TODO LOW PRIORITY - Consider adding an option to look at data quarter by quarter (As in select one quarter and make the start of the quarter 0,0)
-# TODO MEDIUM PRIORITY - Move color configuration and moment time conversion to front end
 # TODO LOW PRIORITY - Custom tooltips
 # TODO LOW PRIORITY - Add datapoints for sub-ins and sub-outs
-# TODO HIGH PRIORITY - Free throws occur at the same timestamp for each pair of free throws. Figure out how to handle this in the data generation (if the graph ends up looking bad)
+# TODO MEDIUM PRIORITY - Free throws occur at the same timestamp for each pair of free throws. Figure out how to handle this in the data generation (if the graph ends up looking bad)
 # TODO MEDIUM PRIORITY - Add final data point for end of 4th quarter for each player
+# TODO LOW PRIOIRTY - Add option to show missed shots
 
 # Generate graph data when selected stat is points
+# TODO HIGH PRIORITY - Add away players generation
 def generate_data_pts(home, away, row_set):
     graph_data = _init_config_json()
     keywords = ["Shot", "shot", "Layup", "layup", "Free", "free", "Dunk", "dunk", "Jumper", "jumper"]
@@ -36,11 +37,12 @@ def generate_data_pts(home, away, row_set):
             # Name as it appears in a play by play
             pbp_name = _prepare_player_name(item)
             dataset = _init_dataset_json(item)
+            pts = 0
             for row in row_set:
                 # Play by play description
                 desc = row[_HOME_DESCRIPTION]
-                # Is the description we're looking at talking about a made basket
-                if desc and any(substring in desc for substring in keywords) and (not 'MISS' in desc):
+                # Is the description we're looking at talking about a made basket (and not talking about the shot clock)
+                if desc and any(substring in desc for substring in keywords) and (not 'MISS' in desc) and (not "Shot Clock" in desc):
                     # TODO LOWEST PRIORITY - Maybe condense the if-elif into one and then break them up in a nested if-elif because the stuff after extracting the points is exactly the same
                     if whole_team:
                         print desc
@@ -59,12 +61,50 @@ def generate_data_pts(home, away, row_set):
                             print "Could not find a value. Ignoring this pbp statement."
                     else:
                         pass
+            # Add endgame value to dataset
+            dataset["data"].append({"x": "48:00", "y": pts})
+            graph_data["data"]["datasets"].append(dataset)
+
+    # Away roster second
+    if not "NOPLAYERS" in away:
+        for item in away:
+            print item
+            # Is the current item the whole team
+            whole_team = ("(team" in item)
+            # Name as it appears in a play by play
+            pbp_name = _prepare_player_name(item)
+            dataset = _init_dataset_json(item)
+            pts = 0
+            for row in row_set:
+                # Play by play description
+                desc = row[_AWAY_DESCRIPTION]
+                # Is the description we're looking at talking about a made basket (and not talking about the shot clock)
+                if desc and any(substring in desc for substring in keywords) and (not 'MISS' in desc) and (not "Shot Clock" in desc):
+                    # TODO LOWEST PRIORITY - Maybe condense the if-elif into one and then break them up in a nested if-elif because the stuff after extracting the points is exactly the same
+                    if whole_team:
+                        print desc
+                        pts = int(row[_SCORE].split(" - ")[0])
+                        print str(pts)
+                        time = _convert_pctime_to_timestamp(row[_PERIOD], row[_PLAY_CLOCK])
+                        dataset["data"].append({"x": time, "y": pts})
+                    elif pbp_name in desc and not ("(" + pbp_name) in desc:
+                        print desc
+                        try:
+                            pts = int(re.search("\((.+?) PTS", desc).group(1))
+                            print str(pts)
+                            time = _convert_pctime_to_timestamp(row[_PERIOD], row[_PLAY_CLOCK])
+                            dataset["data"].append({"x": time, "y": pts})
+                        except AttributeError:
+                            print "Could not find a value. Ignoring this pbp statement."
+                    else:
+                        pass
+            # Add endgame value to dataset
+            dataset["data"].append({"x": "48:00", "y": pts})
             graph_data["data"]["datasets"].append(dataset)
 
     return graph_data
 
 
-# TODO HIGH PRIORITY - Detail options (maybe on the front end?)
 def _init_config_json():
     graph_data = dict()
     graph_data["type"] = "line"
@@ -88,7 +128,7 @@ def _init_config_json():
                 },
                 "scaleLabel": {
                     "display": True,
-                    "labelString": 'Minutes'
+                    "labelString": 'Minutes into the Game'
                 }
             }],
             "yAxes": [{
@@ -121,8 +161,6 @@ def _prepare_player_name(player):
         return player.split(" ")[-1]
 
 
-# TODO HIGHEST PRIORITY - Finish this function
-# TODO - Might have to format so minutes and seconds are ALWAYS mm:ss (right now could potentially return m:s)
 def _convert_pctime_to_timestamp(quarter, pctime):
     total_minutes = quarter * 12
     total_seconds = 60

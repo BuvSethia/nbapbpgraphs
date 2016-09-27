@@ -26,3 +26,18 @@ function formatTimesAsMoments(chartData){
         })
     });
 }
+
+function addCustomTooltips(chartData){
+    chartData.options.tooltips = {
+        enabled: true,
+        mode: 'single',
+        callbacks: {
+            "label": function(tooltipItems, data) {
+                return data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index].label;
+            },
+            "title": function(tooltipItems, data) {
+                return data.datasets[tooltipItems[0].datasetIndex].label;
+            }
+        }
+    }
+}

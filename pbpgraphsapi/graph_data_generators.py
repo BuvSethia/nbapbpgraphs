@@ -20,6 +20,7 @@ NOTES - Right now, the easiest (but probably least efficient) way of generating 
 # TODO LOW PRIORITY - Add datapoints for sub-ins and sub-outs
 # TODO LOW PRIORITY - Add option to remove missed shots
 # TODO HIGHEST PRIORITY - Implement the rest of the stats
+# TODO HIGHEST PRIORITY - Handle overtime games
 
 # Generate graph data when selected stat is points
 # TODO HIGH PRIORITY - Add away players generation
@@ -49,7 +50,8 @@ def generate_data_pts(home, away, row_set):
                             pts = int(row[_SCORE].split(" - ")[1])
                         print str(pts)
                         time = _convert_pctime_to_timestamp(row[_PERIOD], row[_PLAY_CLOCK])
-                        dataset["data"].append({"x": time, "y": pts})
+                        label = ["Q" + str(row[_PERIOD]) + ", " + str(row[_PLAY_CLOCK]), desc]
+                        dataset["data"].append({"x": time, "y": pts, "label": label})
                     elif pbp_name in desc and not ("(" + pbp_name) in desc:
                         print desc
                         try:
@@ -57,13 +59,15 @@ def generate_data_pts(home, away, row_set):
                                 pts = int(re.search("\((.+?) PTS", desc).group(1))
                             print str(pts)
                             time = _convert_pctime_to_timestamp(row[_PERIOD], row[_PLAY_CLOCK])
-                            dataset["data"].append({"x": time, "y": pts})
+                            label = ["Q" + str(row[_PERIOD]) + ", " + str(row[_PLAY_CLOCK]), desc]
+                            dataset["data"].append({"x": time, "y": pts, "label": label})
                         except AttributeError:
                             print "Could not find a value. Ignoring this pbp statement."
                     else:
                         pass
             # Add endgame value to dataset
-            dataset["data"].append({"x": "48:00", "y": pts})
+            final_label = "Final total: " + str(pts) + " points"
+            dataset["data"].append({"x": "48:00", "y": pts, "label": final_label})
             graph_data["data"]["datasets"].append(dataset)
 
     return graph_data
@@ -102,7 +106,7 @@ def _init_config_json():
                     "labelString": 'Value'
                 }
             }]
-        },
+        }
     }
     return graph_data
 
@@ -110,7 +114,7 @@ def _init_config_json():
 def _init_dataset_json(item):
     # Prepare name for label - gets rid of sharedlast for players who share last name with teammate and remove (team) for full team
     name = item.replace("sharedlast", "").replace("(team)", "").strip()
-    return {"label": name, "data": [{"x": "00:00", "y": 0}], "fill": False}
+    return {"label": name, "data": [{"x": "00:00", "y": 0, "label": "Start of game"}], "fill": False}
 
 
 # Return item name as it will appear in a box score

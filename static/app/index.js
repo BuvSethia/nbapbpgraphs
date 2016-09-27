@@ -125,6 +125,7 @@ app.controller("mainController", function($scope, $http) {
             $http.get("/graphdata/" + $scope.selectedGame['id'] + "/" + chosenStat + "/" + homePlayers + "/" + awayPlayers).success(function (data, status, headers, config) {
                 window.myLine = null;
                 addColorOptionsToChart(data);
+                addCustomTooltips(data);
                 console.log(data);
                 var ctx = document.getElementById("myChart").getContext("2d");
                 if(window.myLine){

@@ -38,9 +38,11 @@ def generate_data_pts(home, away, row_set):
             pbp_name = _prepare_player_name(item)
             dataset = _init_dataset_json(item)
             pts = 0
+            final_quarter = 0
             for row in row_set:
                 # Play by play description
                 desc = row[_HOME_DESCRIPTION]
+                final_quarter = row[_PERIOD]
                 # Is the description we're looking at talking about a made basket (and not talking about the shot clock)
                 if desc and any(substring in desc for substring in keywords) and (not "Shot Clock" in desc):
                     # TODO LOWEST PRIORITY - Maybe condense the if-elif into one and then break them up in a nested if-elif because the stuff after extracting the points is exactly the same
@@ -59,6 +61,7 @@ def generate_data_pts(home, away, row_set):
                                 pts = int(re.search("\((.+?) PTS", desc).group(1))
                             print str(pts)
                             time = _convert_pctime_to_timestamp(row[_PERIOD], row[_PLAY_CLOCK])
+                            # TODO LOW PRIORITY - Turn Q + period into function that accounts for overtimes
                             label = ["Q" + str(row[_PERIOD]) + ", " + str(row[_PLAY_CLOCK]), desc]
                             dataset["data"].append({"x": time, "y": pts, "label": label})
                         except AttributeError:
@@ -67,7 +70,7 @@ def generate_data_pts(home, away, row_set):
                         pass
             # Add endgame value to dataset
             final_label = "Final total: " + str(pts) + " points"
-            dataset["data"].append({"x": "48:00", "y": pts, "label": final_label})
+            dataset["data"].append({"x": _get_game_length_as_string(final_quarter), "y": pts, "label": final_label})
             graph_data["data"]["datasets"].append(dataset)
 
     return graph_data
@@ -130,7 +133,10 @@ def _prepare_player_name(player):
 
 
 def _convert_pctime_to_timestamp(quarter, pctime):
-    total_minutes = quarter * 12
+    if quarter <= 4:
+        total_minutes = quarter * 12
+    else:
+        total_minutes = 48 + (quarter - 4) * 5
     total_seconds = 60
     time_split = pctime.split(":")
     minutes = int(time_split[0])
@@ -140,3 +146,10 @@ def _convert_pctime_to_timestamp(quarter, pctime):
         minutes = minutes - 1
         seconds = total_seconds - seconds
     return str(minutes) + ":" + str(seconds)
+
+
+def _get_game_length_as_string(quarter):
+    if quarter == 4:
+        return "48:00"
+    else:
+        return str(48 + ((quarter - 4) * 5)) + ":00"

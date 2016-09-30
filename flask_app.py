@@ -62,7 +62,7 @@ def get_full_name(abbr):
 # TODO LOW PRIORITY - Consider making this a POST instead of a GET
 @app.route('/graphdata/<string:gameid>/<string:stat>/<string:home>/<string:away>')
 def create_graph_data_for_players_and_stat(gameid, stat, home, away):
-    url = 'http://stats.nba.com/stats/playbyplay?GameID=' + gameid + '&StartPeriod=1&EndPeriod=4'
+    url = 'http://stats.nba.com/stats/playbyplay?GameID=' + gameid + '&StartPeriod=1&EndPeriod=14'
     if stat == "PTS":
         return jsonify(generate_data_pts(home.split("_"), away.split("_"), make_request(url)))
     else:

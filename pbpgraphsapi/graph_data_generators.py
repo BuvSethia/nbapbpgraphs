@@ -16,11 +16,11 @@ NOTES - Right now, the easiest (but probably least efficient) way of generating 
 '''
 
 # TODO LOW PRIORITY - Consider adding an option to look at data quarter by quarter (As in select one quarter and make the start of the quarter 0,0)
-# TODO LOW PRIORITY - Custom tooltips
 # TODO LOW PRIORITY - Add datapoints for sub-ins and sub-outs
 # TODO LOW PRIORITY - Add option to remove missed shots
 # TODO HIGHEST PRIORITY - Implement the rest of the stats
 # TODO HIGHEST PRIORITY - Handle overtime games
+# TODO LOWEST PRIORITY - Y-axis should always start at 0
 
 # Generate graph data when selected stat is points
 # TODO HIGH PRIORITY - Add away players generation
@@ -83,9 +83,15 @@ def _init_config_json():
     graph_data["options"] = {
         "responsive": True,
         "title":{
-            "display":True,
-            "text":"NBA Play By Play Graphs"
+            "display": True,
+            "text": "NBA Play By Play Graphs"
         },
+        '''
+        "zoom": {
+            "enabled": True,
+            "mode": 'x'
+        },
+        '''
         "scales": {
             "xAxes": [{
                 "type": "time",

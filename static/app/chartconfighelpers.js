@@ -1,5 +1,6 @@
 // TODO LOW PRIORITY - Make colors prettier
 // TODO HIGH PRIORITY - When the graph refreshes the colors shouldn't change
+// TODO MEDIUM PRIORITY - Make these methods return something (stateful)
 
 function randomColorFactor() {
     return Math.round(Math.random() * 255);

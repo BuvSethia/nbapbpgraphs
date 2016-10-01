@@ -1,7 +1,7 @@
 // TODO - Clean up frontend code. Consider splitting into multiple controllers and maybe using services/factories for data parsing. Directives maybe?
 // TODO HIGH PRIORITY - Auto-refresh graph
 // TODO MEDIUM PRIORITY - Refresh button
-// TODO MEDIUM PRIORITY - Graph zooming
+// TODO LOW PRIORITY - Graph zooming (ON HOLD DUE TO ZOOMING PACKAGE BEING KINDA WONKY WITH TIME SCALES...)
 
 var app = angular.module("mainApp", ["checklist-model"]);
 

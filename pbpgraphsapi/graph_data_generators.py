@@ -7,6 +7,8 @@ _AWAY_DESCRIPTION = 9
 _PERIOD = 4
 _PLAY_CLOCK = 6
 _SCORE = 10
+_CREATE = 'create'
+_UPDATE = 'update'
 
 '''
 NOTES - Right now, the easiest (but probably least efficient) way of generating data is to do one pass per player.
@@ -24,7 +26,8 @@ NOTES - Right now, the easiest (but probably least efficient) way of generating 
 
 # Generate graph data when selected stat is points
 # TODO HIGH PRIORITY - Add away players generation
-def generate_data_pts(home, away, row_set):
+# TODO HIGHEST PRIORITY - Add support for graph refresh
+def generate_data_pts(type, home, away, row_set):
     graph_data = _init_config_json()
     keywords = ["Shot", "shot", "Layup", "layup", "Free", "free", "Dunk", "dunk", "Jumper", "jumper"]
 

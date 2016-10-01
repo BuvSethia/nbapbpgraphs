@@ -1,7 +1,6 @@
 // TODO - Clean up frontend code. Consider splitting into multiple controllers and maybe using services/factories for data parsing. Directives maybe?
 // TODO HIGH PRIORITY - Auto-refresh graph
 // TODO MEDIUM PRIORITY - Refresh button
-// TODO LOW PRIORITY - Graph zooming (ON HOLD DUE TO ZOOMING PACKAGE BEING KINDA WONKY WITH TIME SCALES...)
 
 var app = angular.module("mainApp", ["checklist-model"]);
 
@@ -122,6 +121,8 @@ app.controller("mainController", function($scope, $http) {
                 awayPlayers = generatePlayersString(chosenPlayersAway.slice(0), Object.keys($scope.awayRoster));
             }
 
+            // TODO HIGHEST PRIORITY - Convert this to a POST
+            // TODO HIGHEST PRIORITY - Add support for graph refresh into POST
             $http.get("/graphdata/" + $scope.selectedGame['id'] + "/" + chosenStat + "/" + homePlayers + "/" + awayPlayers).success(function (data, status, headers, config) {
                 window.myLine = null;
                 addColorOptionsToChart(data);

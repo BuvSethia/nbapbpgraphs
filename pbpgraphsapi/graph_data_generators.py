@@ -17,6 +17,14 @@ NOTES - Right now, the easiest (but probably least efficient) way of generating 
         to see if it's possible to make it more efficient. But honestly, one pass per player is probably the best way.
 '''
 
+
+'''
+"zoom": {
+    "enabled": True,
+    "mode": 'x'
+},
+'''
+
 # TODO LOW PRIORITY - Consider adding an option to look at data quarter by quarter (As in select one quarter and make the start of the quarter 0,0)
 # TODO LOW PRIORITY - Add datapoints for sub-ins and sub-outs
 # TODO LOW PRIORITY - Add option to remove missed shots
@@ -30,7 +38,7 @@ NOTES - Right now, the easiest (but probably least efficient) way of generating 
 def generate_data_pts(type, home, away, row_set):
     graph_data = _init_config_json()
     keywords = ["Shot", "shot", "Layup", "layup", "Free", "free", "Dunk", "dunk", "Jumper", "jumper"]
-
+    print type
     # Home roster first
     if not "NOPLAYERS" in home:
         for item in home:
@@ -55,7 +63,7 @@ def generate_data_pts(type, home, away, row_set):
                             pts = int(row[_SCORE].split(" - ")[1])
                         print str(pts)
                         time = _convert_pctime_to_timestamp(row[_PERIOD], row[_PLAY_CLOCK])
-                        label = ["Q" + str(row[_PERIOD]) + ", " + str(row[_PLAY_CLOCK]), desc]
+                        label = ["Q" + str(row[_PERIOD]) + ", " + str(row[_PLAY_CLOCK]) + "  --  " + str(pts) + " PTS", desc]
                         dataset["data"].append({"x": time, "y": pts, "label": label})
                     elif pbp_name in desc and not ("(" + pbp_name) in desc:
                         print desc
@@ -65,7 +73,7 @@ def generate_data_pts(type, home, away, row_set):
                             print str(pts)
                             time = _convert_pctime_to_timestamp(row[_PERIOD], row[_PLAY_CLOCK])
                             # TODO LOW PRIORITY - Turn Q + period into function that accounts for overtimes
-                            label = ["Q" + str(row[_PERIOD]) + ", " + str(row[_PLAY_CLOCK]), desc]
+                            label = ["Q" + str(row[_PERIOD]) + ", " + str(row[_PLAY_CLOCK]) + "  --  " + str(pts) + " PTS", desc]
                             dataset["data"].append({"x": time, "y": pts, "label": label})
                         except AttributeError:
                             print "Could not find a value. Ignoring this pbp statement."
@@ -89,12 +97,6 @@ def _init_config_json():
             "display": True,
             "text": "NBA Play By Play Graphs"
         },
-        '''
-        "zoom": {
-            "enabled": True,
-            "mode": 'x'
-        },
-        '''
         "scales": {
             "xAxes": [{
                 "type": "time",
@@ -116,6 +118,10 @@ def _init_config_json():
                     "display": True,
                     # TODO LOW PRIORITY - Make this the acutal stat being displayed
                     "labelString": 'Value'
+                },
+                "ticks": {
+                    "suggestedMax": 20,
+                    "suggestedMin": 0
                 }
             }]
         }

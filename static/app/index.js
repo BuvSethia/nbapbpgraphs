@@ -70,8 +70,9 @@ app.controller("mainController", function($scope, $http) {
             $scope.awayTeam = data;
             $scope.awayTeamChecklist = data + " (team)";
         })
-        .error(function () {
+        .error(function (error) {
             alert("There was an error reaching the server. Yay.");
+            console.log(error);
         });
 
         $http.get("/roster/" + teams[1]).success(function (data, status, headers, config) {
@@ -112,18 +113,26 @@ app.controller("mainController", function($scope, $http) {
             var homePlayers = "NOPLAYERS";
             if(chosenPlayersHome.length != 0)
             {
-                homePlayers = generatePlayersString(chosenPlayersHome.slice(0), Object.keys($scope.homeRoster));
+                homePlayers = identifySharedLast(chosenPlayersHome.slice(0), Object.keys($scope.homeRoster));
             }
 
             var awayPlayers = "NOPLAYERS";
             if(chosenPlayersAway.length != 0)
             {
-                awayPlayers = generatePlayersString(chosenPlayersAway.slice(0), Object.keys($scope.awayRoster));
+                awayPlayers = identifySharedLast(chosenPlayersAway.slice(0), Object.keys($scope.awayRoster));
             }
 
             // TODO HIGHEST PRIORITY - Convert this to a POST
             // TODO HIGHEST PRIORITY - Add support for graph refresh into POST
-            $http.get("/graphdata/" + $scope.selectedGame['id'] + "/" + chosenStat + "/" + homePlayers + "/" + awayPlayers).success(function (data, status, headers, config) {
+            var data = {
+                home: homePlayers,
+                away: awayPlayers,
+                stat: chosenStat,
+                type: 'create',
+                gameid: $scope.selectedGame['id']
+            }
+            $http.post("/graphdata", data)
+            .success(function (data, status, headers, config) {
                 window.myLine = null;
                 addColorOptionsToChart(data);
                 addCustomTooltips(data);
@@ -142,7 +151,7 @@ app.controller("mainController", function($scope, $http) {
 
         //Join names together to pass to API endpoint while also identifying players who share a common last name with a teammate
         //TODO LOW PRIORITY - Consider moving this to the backend and making an extra API call to get the full roster to fully separate frontend and backend
-        function generatePlayersString(chosenPlayersList, fullRoster){
+        function identifySharedLast(chosenPlayersList, fullRoster){
             //console.log("Length of full roster: " + fullRoster.length);
             for(var i = 0; i < chosenPlayersList.length; i++){
                 for(var j = 0; j < fullRoster.length; j++){
@@ -158,7 +167,7 @@ app.controller("mainController", function($scope, $http) {
             }
 
             //console.log("Chosen players modded: " + chosenPlayersList);
-            return encodeURIComponent(chosenPlayersList.join('_'));
+            return chosenPlayersList;
         }
     }
 });

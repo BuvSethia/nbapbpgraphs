@@ -74,11 +74,11 @@ def create_graph_data_for_players_and_stat(gameid, stat, home, away):
 
 @app.route('/graphdata', methods=['POST'])
 def create_graph_data_for_players_and_stat_post():
-    url = 'http://stats.nba.com/stats/playbyplay?GameID=' + request.form['gameid'] + '&StartPeriod=1&EndPeriod=14'
-    if request.form['stat'] == "PTS":
-        return jsonify(generate_data_pts(request.form['type'], request.form['home'], request.form['away'], make_request(url)))
+    url = 'http://stats.nba.com/stats/playbyplay?GameID=' + request.json['gameid'] + '&StartPeriod=1&EndPeriod=14'
+    if request.json['stat'] == "PTS":
+        return jsonify(generate_data_pts(request.json['type'], request.json['home'], request.json['away'], make_request(url)))
     else:
-        return 'Magical edge case that should never be reached ' + request.form['stat']
+        return 'Magical edge case that should never be reached ' + request.json['stat']
 
 
 if __name__ == '__main__':

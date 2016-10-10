@@ -101,13 +101,9 @@ app.controller("mainController", function($scope, $http) {
     $scope.generateGraphData = function(chosenPlayersHome, chosenPlayersAway, chosenStat)
     {
         if(!chosenStat || (chosenPlayersHome.length === 0 && chosenPlayersAway.length === 0))
-        {
             alert("Please select a stat AND players to graph");
-        }
         else if (chosenPlayersHome.length + chosenPlayersAway.length > 4)
-        {
-            alert("Please choose at most 4 players to graph. Sorry for now.")
-        }
+            alert("Please choose at most 4 players to graph. Sorry for now.");
         else
         {
             var homePlayers = "NOPLAYERS";
@@ -122,8 +118,6 @@ app.controller("mainController", function($scope, $http) {
                 awayPlayers = identifySharedLast(chosenPlayersAway.slice(0), Object.keys($scope.awayRoster));
             }
 
-            // TODO HIGHEST PRIORITY - Convert this to a POST
-            // TODO HIGHEST PRIORITY - Add support for graph refresh into POST
             var data = {
                 home: homePlayers,
                 away: awayPlayers,

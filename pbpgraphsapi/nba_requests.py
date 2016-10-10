@@ -1,8 +1,68 @@
-__author__ = 'Sumbhav'
-
+from flask import jsonify
+from teams import All_TEAMS
+from graph_data_generators import generate_data_pts
 import requests
 
-def make_request(url):
+
+def fetch_games_for_date(date):
+    # Get the result from nba.com
+    url = 'http://stats.nba.com/stats/scoreboard?DayOffset=0&LeagueID=00&GameDate=' + date
+    try:
+        row_set = _make_request(url)
+        games = list()
+        for row in row_set:
+            game_id = row[2]
+            name = str(row[5]).split('/')[1]
+            name_formatted = name[:3] + '@' + name[3:]
+            games.append({'name': name_formatted, 'id': game_id})
+
+        return jsonify(result='Success', gameList=games)
+    except:
+        return jsonify(result='Error')
+
+
+# TODO HIGH PRIORITY - Currently only works for 2015-16 season. Use date ranges to make work for all seasons
+# TODO LOW PRIORITY - Modify to make this endpoint work for the All-Star teams as well
+# TODO MEDIUM PRIORITY - Modify this to account for mid-season trades somehow
+def fetch_roster(team):
+    # Get the result from nba.com
+    url = 'http://stats.nba.com/stats/commonteamroster?Season=2015-16&TeamID=' + (All_TEAMS[team])['id']
+    try:
+        row_set = _make_request(url)
+        players = dict()
+        for row in row_set:
+            '''
+            team_id = row[0]
+            name = row[3]
+            number = row[4]
+            position = row[5]
+            player_id = row[12]
+            '''
+            players[row[3]] = {'teamID': row[0], 'playerID': row[12], 'number': row[4], 'position': row[5]}
+
+        return jsonify(result='Success', roster=players)
+    except:
+        return jsonify(result='Error')
+
+
+def fetch_team_name(team):
+    if All_TEAMS[team]:
+        return All_TEAMS[team]['name']
+    else:
+        return "TNF"
+
+
+def generate_graph_data(gameid, stat, type, home, away):
+    url = 'http://stats.nba.com/stats/playbyplay?GameID=' + gameid + '&StartPeriod=1&EndPeriod=14'
+    # TODO HIGH PRIORITY - Break _make request() into a separate call to do error checks before passing to function
+    if stat == "PTS":
+        return jsonify(generate_data_pts(type, home, away, _make_request(url)))
+    else:
+        return 'Magical edge case that should never be reached ' + stat
+
+
+# TODO HIGH PRIORITY - Check for return status codes here
+def _make_request(url):
     headers = {'user-agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) '
                               'AppleWebKit/537.36 (KHTML, like Gecko) '
                               'Chrome/45.0.2454.101 Safari/537.36'),

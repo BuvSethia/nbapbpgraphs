@@ -44,6 +44,7 @@ def _generate_data_for_roster(roster_type, roster, data, stat):
                 desc = row[desc_loc]
                 final_quarter = row[_PERIOD]
                 if desc and _row_contains_stat_data(desc, stat):
+					# CONTINUE FROM HERE
                     if whole_team:
                         if not 'MISS' in desc:
                             pts = int(row[_SCORE].split(" - ")[1])

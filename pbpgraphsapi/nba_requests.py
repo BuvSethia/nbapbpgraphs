@@ -1,25 +1,23 @@
 from flask import jsonify
 from teams import All_TEAMS
-from graph_data_generators import generate_data_pts
+from graph_data_generator import generate_data
 import requests
 
 
 def fetch_games_for_date(date):
     # Get the result from nba.com
-    url = 'http://stats.nba.com/stats/scoreboard?DayOffset=0&LeagueID=00&GameDate=' + date
-    response = _make_request(url)
-    if response["result"] is not "Error":
-        row_set = response["data"]
-        games = list()
-        for row in row_set:
-            game_id = row[2]
-            name = str(row[5]).split('/')[1]
-            name_formatted = name[:3] + '@' + name[3:]
-            games.append({'name': name_formatted, 'id': game_id})
-
-        return jsonify(result='Success', gameList=games)
-
-    return jsonify(result='Error')
+	url = 'http://stats.nba.com/stats/scoreboard?DayOffset=0&LeagueID=00&GameDate=' + date
+	response = _make_request(url)
+	if response["result"] is not "Error":
+		row_set = response["data"]
+		games = list()
+		for row in row_set:
+			game_id = row[2]
+			name = str(row[5]).split('/')[1]
+			name_formatted = name[:3] + '@' + name[3:]
+			games.append({'name': name_formatted, 'id': game_id})
+		return jsonify(result='Success', gameList=games)
+	return jsonify(result='Error')
 
 
 # TODO HIGH PRIORITY - Currently only works for 2015-16 season. Use date ranges to make work for all seasons
@@ -33,18 +31,10 @@ def fetch_roster(team):
         row_set = response["data"]
         players = dict()
         for row in row_set:
-            '''
-            team_id = row[0]
-            name = row[3]
-            number = row[4]
-            position = row[5]
-            player_id = row[12]
-            '''
+            # team_id = row[0], name = row[3], number = row[4], position = row[5], player_id = row[12]
             players[row[3]] = {'teamID': row[0], 'playerID': row[12], 'number': row[4], 'position': row[5]}
-
         return jsonify(result='Success', roster=players)
-
-    return jsonify(result='Error', message='Unable to get the current roster for ' + team + '. Please try again later.')
+	return jsonify(result='Error', message='Unable to get the current roster for ' + team + '. Please try again later.')
 
 
 def fetch_team_name(team):
@@ -62,7 +52,7 @@ def generate_graph_data(gameid, stat, type, home, away):
 
     row_set = response["data"]
     if stat == "PTS":
-        return jsonify(generate_data_pts(type, home, away, row_set, 'PTS'))
+        return jsonify(generate_data(home, away, row_set, 'PTS'))
     else:
         return 'Magical edge case that should never be reached ' + stat
 
@@ -79,4 +69,4 @@ def _make_request(url):
         # Return the relevant rows
         return {'result': 'Success', 'data': result['resultSets'][0]['rowSet']}
     except:
-        return {'result': 'Error'}
+		return {'result': 'Error'}

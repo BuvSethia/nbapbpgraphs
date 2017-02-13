@@ -127,15 +127,18 @@ app.controller("mainController", function($scope, $http) {
             }
             $http.post("/graphdata", data)
             .success(function (data, status, headers, config) {
-                window.myLine = null;
-                addColorOptionsToChart(data);
-                addCustomTooltips(data);
-                console.log(data);
-                var ctx = document.getElementById("myChart").getContext("2d");
-                if(window.myLine){
-                    window.myLine.destroy();
-                }
-			    window.myLine = new Chart(ctx, data);
+								// Workaround to prevent new/old data flickering
+								$timeout(function() {
+									window.myLine = null;
+	                addColorOptionsToChart(data);
+	                addCustomTooltips(data);
+	                console.log(data);
+	                var ctx = document.getElementById("myChart").getContext("2d");
+	                if(window.myLine){
+	                    window.myLine.destroy();
+	                }
+				    			window.myLine = new Chart(ctx, data);
+								});
             })
             .error(function () {
                 alert("There was an error reaching the server. Yay.");

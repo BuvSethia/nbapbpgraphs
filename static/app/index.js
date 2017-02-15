@@ -4,7 +4,7 @@
 
 var app = angular.module("mainApp", ["checklist-model"]);
 
-app.controller("mainController", function($scope, $http) {
+app.controller("mainController", function($scope, $http, $timeout) {
 	//High level information regarding the game selected
 	$scope.gameMetadata = [];
 	//User help text

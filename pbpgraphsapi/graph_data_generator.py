@@ -53,6 +53,7 @@ def _generate_data_for_roster(roster_type, roster, data, stat):
             # Add endgame value to dataset if game is over
 			if data[-1][_PLAY_CLOCK] == "0:00":
 				final_label = "Final total: " + str(value) + " " + stat
+				print final_label
 				dataset["data"].append({"x": _get_game_length_as_string(data[-1][_PERIOD]), "y": value, "label": final_label})
 				datasets.append(dataset)
 	return datasets

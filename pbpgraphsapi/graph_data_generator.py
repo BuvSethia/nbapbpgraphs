@@ -149,10 +149,12 @@ def _get_keywords_for_stat(stat):
         return []
 
 def _row_contains_stat_data(row, stat):
-    if stat == 'PTS':
-        return any(substring in row for substring in _get_keywords_for_stat(stat)) and (not "Shot Clock" in row)
-    else:
-        return False
+	if stat == 'PTS':
+		return any(substring in row for substring in _get_keywords_for_stat(stat)) and (not "Shot Clock" in row)
+	elif stat == 'AST':
+		return " AST" in row
+	else:
+		return False
 
 def _period_as_string(period):
     return 'Q' + str(period) if period <= 4 else 'OT' + str(period - 4)
@@ -166,6 +168,8 @@ def _extract_stat_for_whole_team(stat, row, description, current_value):
 			return int(row[_SCORE].split(" - ")[1])
 		else:
 			return current_value
+	elif stat == 'AST':
+		return current_value + 1
 	else:
 		return None
 
@@ -175,11 +179,15 @@ def _extract_stat_for_player(stat, description, current_value):
 			return int(re.search("\((.+?) PTS", description).group(1))
 		else:
 			return current_value
+	elif stat == 'AST':
+		return current_value + 1
 	else:
 		return None
 
 def _stat_pertains_to_player(stat, pbp_name, desc):
 	if stat == 'PTS':
 		return pbp_name in desc and not ("(" + pbp_name) in desc
+	elif stat == 'AST':
+		return ('(' + pbp_name) in desc
 	else:
 		return False

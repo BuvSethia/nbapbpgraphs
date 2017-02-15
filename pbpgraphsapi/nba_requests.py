@@ -45,16 +45,18 @@ def fetch_team_name(team):
 
 
 def generate_graph_data(gameid, stat, type, home, away):
-    url = 'http://stats.nba.com/stats/playbyplay?GameID=' + gameid + '&StartPeriod=1&EndPeriod=14'
-    response = _make_request(url)
-    if response["result"] is "Error":
-        return jsonify(result='Error', message='Unable to generate graph data right now. Please try again later.')
+	url = 'http://stats.nba.com/stats/playbyplay?GameID=' + gameid + '&StartPeriod=1&EndPeriod=14'
+	response = _make_request(url)
+	if response["result"] is "Error":
+		return jsonify(result='Error', message='Unable to generate graph data right now. Please try again later.')
 
-    row_set = response["data"]
-    if stat == "PTS":
-        return jsonify(generate_data(home, away, row_set, 'PTS'))
-    else:
-        return 'Magical edge case that should never be reached ' + stat
+	row_set = response["data"]
+	if stat == "PTS":
+		return jsonify(generate_data(home, away, row_set, 'PTS'))
+	elif stat == "AST":
+		return jsonify(generate_data(home, away, row_set, 'AST'))
+	else:
+		return 'Magical edge case that should never be reached ' + stat
 
 
 # TODO HIGH PRIORITY - Check for return status codes here

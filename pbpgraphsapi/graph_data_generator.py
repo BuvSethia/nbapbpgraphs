@@ -153,6 +153,8 @@ def _row_contains_stat_data(row, stat):
 		return any(substring in row for substring in _get_keywords_for_stat(stat)) and (not "Shot Clock" in row)
 	elif stat == 'AST':
 		return " AST" in row
+	elif 'REB' in stat:
+		return 'rebound' in row.lower()
 	else:
 		return False
 
@@ -170,8 +172,14 @@ def _extract_stat_for_whole_team(stat, row, description, current_value):
 			return current_value
 	elif stat == 'AST':
 		return current_value + 1
+	elif stat == 'OREB':
+		return 0
+	elif stat == 'DREB':
+		return 0
+	elif stat == 'TREB':
+		return current_value + 1
 	else:
-		return None
+		return 0
 
 def _extract_stat_for_player(stat, description, current_value):
 	if stat == 'PTS':
@@ -181,13 +189,21 @@ def _extract_stat_for_player(stat, description, current_value):
 			return current_value
 	elif stat == 'AST':
 		return current_value + 1
+	elif stat == 'OREB':
+		return int(re.search("\Off:(.+?)", description).group(1))
+	elif stat == 'DREB':
+		return int(re.search("\Def:(.+?)", description).group(1))
+	elif stat == 'TREB':
+		return current_value + 1
 	else:
-		return None
+		return 0
 
 def _stat_pertains_to_player(stat, pbp_name, desc):
 	if stat == 'PTS':
 		return pbp_name in desc and not ("(" + pbp_name) in desc
 	elif stat == 'AST':
 		return ('(' + pbp_name) in desc
+	elif 'REB' in stat:
+		return pbp_name in desc
 	else:
 		return False

@@ -129,15 +129,15 @@ app.controller("mainController", function($scope, $http, $timeout) {
 			.success(function (data, status, headers, config) {
 				// Workaround to prevent new/old data flickering
 				$timeout(function() {
-					window.myLine = null;
+					$scope.myLine = null;
 					addColorOptionsToChart(data);
 					addCustomTooltips(data);
 					console.log(data);
 					var ctx = document.getElementById("myChart").getContext("2d");
-					if(window.myLine){
-						window.myLine.destroy();
+					if($scope.myLine){
+						$scope.myLine.destroy();
 					}
-					window.myLine = new Chart(ctx, data);
+					$scope.myLine = new Chart(ctx, data);
 				});
 			})
 			.error(function () {

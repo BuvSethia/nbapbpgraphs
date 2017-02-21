@@ -12,11 +12,9 @@ _NOPLAYERS = 'NOPLAYERS'
 # TODO LOW PRIORITY - Consider adding an option to look at data quarter by quarter (As in select one quarter and make the start of the quarter 0,0)
 # TODO LOW PRIORITY - Add datapoints for sub-ins and sub-outs
 # TODO LOW PRIORITY - Add option to remove missed shots
-# TODO HIGHEST PRIORITY - Implement the rest of the stats
 # TODO HIGHEST PRIORITY - Handle overtime games
-# TODO LOWEST PRIORITY - Y-axis should always start at 0
-
 # TODO HIGHEST PRIORITY - Add support for graph refresh
+
 def generate_data(home, away, row_set, stat):
 	graph_data = _init_config_json()
 	home_data = _generate_data_for_roster('HOME', home, row_set, stat)
@@ -27,20 +25,18 @@ def generate_data(home, away, row_set, stat):
 
 def _generate_data_for_roster(roster_type, roster, data, stat):
 	datasets = []
-	desc_loc = _index_for_roster_type(roster_type)
-    # If players to evaluate
+	desc_loc = _get_desc_index(roster_type, stat)
 	if not _NOPLAYERS in roster:
 		for item in roster:
 			print item
-            # Is the current item the whole team
 			whole_team = ("(team" in item)
-            # Name as it appears in a play by play
 			pbp_name = _prepare_player_name(item)
+			print pbp_name
 			dataset = _init_dataset_json(item)
 			value = 0
 			for row in data:
-                # Play by play description
 				desc = row[desc_loc]
+				print desc
 				if desc and _row_contains_stat_data(desc, stat):
 					if whole_team or _stat_pertains_to_player(stat, pbp_name, desc):
 						if whole_team:
@@ -50,7 +46,6 @@ def _generate_data_for_roster(roster_type, roster, data, stat):
 						time = _convert_pctime_to_timestamp(row[_PERIOD], row[_PLAY_CLOCK])
 						label = ["Q" + str(row[_PERIOD]) + ", " + str(row[_PLAY_CLOCK]) + "  --  " + str(value) + " " + stat, desc]
 						dataset["data"].append({"x": time, "y": value, "label": label})
-            # Add endgame value to dataset if game is over
 			if data[-1][_PLAY_CLOCK] == "0:00":
 				final_label = "Final total: " + str(value) + " " + stat
 				print final_label
@@ -114,8 +109,7 @@ def _init_dataset_json(item):
     name = item.replace("sharedlast", "").replace("(team)", "").strip()
     return {"label": name, "data": [{"x": "00:00", "y": 0, "label": "Start of game"}], "fill": False}
 
-
-# Return item name as it will appear in a play by play
+# TODO HIGH PRIORITY - Else case should return everything except first object in array, not just last object in array (Eg. Glenn Robinson III -> Robinson III not just Robinson)
 def _prepare_player_name(player):
     # If it's the whole team, leave it untouched
     if "(team)" in player:
@@ -124,7 +118,7 @@ def _prepare_player_name(player):
     elif "sharedlast" in player:
         return player.split(" ")[0].replace("sharedlast", "")[0] + ". " + player.split(" ")[-1]
     else:
-        return player.split(" ")[-1]
+        return " ".join(player.split(" ")[1:])
 
 
 def _convert_pctime_to_timestamp(quarter, play_clock_time):
@@ -145,8 +139,7 @@ def _get_game_length_as_string(quarter):
 def _get_keywords_for_stat(stat):
     if stat == 'PTS':
         return ["Shot", "shot", "Layup", "layup", "Free", "free", "Dunk", "dunk", "Jumper", "jumper"]
-    else:
-        return []
+    return []
 
 def _row_contains_stat_data(row, stat):
 	if stat == 'PTS':
@@ -155,14 +148,23 @@ def _row_contains_stat_data(row, stat):
 		return " AST" in row
 	elif 'REB' in stat:
 		return 'rebound' in row.lower()
-	else:
-		return False
+	elif stat == 'STL':
+		return 'STEAL' in row
+	elif stat == 'BLK':
+		return 'BLOCK' in row
+	return False
 
 def _period_as_string(period):
     return 'Q' + str(period) if period <= 4 else 'OT' + str(period - 4)
 
-def _index_for_roster_type(roster):
-    return _HOME_DESCRIPTION if roster == 'HOME' else _AWAY_DESCRIPTION
+def _get_desc_index(roster, stat):
+	return _HOME_DESCRIPTION if roster == 'HOME' else _AWAY_DESCRIPTION
+	'''
+	if roster == 'HOME':
+		return _HOME_DESCRIPTION if stat not in ['STL', 'BLK'] else _AWAY_DESCRIPTION
+	else:
+		return _AWAY_DESCRIPTION if stat not in ['STL', 'BLK'] else _HOME_DESCRIPTION
+	'''
 
 def _extract_stat_for_whole_team(stat, row, description, current_value):
 	if stat == 'PTS':
@@ -178,8 +180,11 @@ def _extract_stat_for_whole_team(stat, row, description, current_value):
 		return 0
 	elif stat == 'TREB':
 		return current_value + 1
-	else:
-		return 0
+	elif stat == 'STL':
+		return current_value + 1
+	elif stat == 'BLK':
+		return current_value + 1
+	return 0
 
 def _extract_stat_for_player(stat, description, current_value):
 	if stat == 'PTS':
@@ -195,8 +200,13 @@ def _extract_stat_for_player(stat, description, current_value):
 		return int(re.search("\Def:(.+?)", description).group(1))
 	elif stat == 'TREB':
 		return current_value + 1
-	else:
-		return 0
+	elif stat == 'STL':
+		return current_value + 1
+		#return int(re.search("Steal\:.*\((.+?) ST\)", description).group(1))
+	elif stat == 'BLK':
+		return current_value + 1
+		#return int(re.search("Missed Block\:.*\((.+?) BLK\)", description).group(1))
+	return 0
 
 def _stat_pertains_to_player(stat, pbp_name, desc):
 	if stat == 'PTS':
@@ -205,5 +215,8 @@ def _stat_pertains_to_player(stat, pbp_name, desc):
 		return ('(' + pbp_name) in desc
 	elif 'REB' in stat:
 		return pbp_name in desc
-	else:
-		return False
+	elif stat == 'STL':
+		return pbp_name in desc
+	elif stat == 'BLK':
+		return pbp_name in desc
+	return False

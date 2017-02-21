@@ -61,8 +61,11 @@ def generate_graph_data(gameid, stat, type, home, away):
 		return jsonify(generate_data(home, away, row_set, 'DREB'))
 	elif stat == 'TREB':
 		return jsonify(generate_data(home, away, row_set, 'TREB'))
-	else:
-		return 'Magical edge case that should never be reached ' + stat
+	elif stat == 'STL':
+		return jsonify(generate_data(home, away, row_set, 'STL'))
+	elif stat == 'BLK':
+		return jsonify(generate_data(home, away, row_set, 'BLK'))
+	return 'Magical edge case that should never be reached ' + stat
 
 
 # TODO HIGH PRIORITY - Check for return status codes here

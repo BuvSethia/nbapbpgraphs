@@ -14,6 +14,7 @@ _NOPLAYERS = 'NOPLAYERS'
 # TODO LOW PRIORITY - Add option to remove missed shots
 # TODO HIGHEST PRIORITY - Handle overtime games
 # TODO HIGHEST PRIORITY - Add support for graph refresh
+# TODO MID PRIORITY - Implement _prepare_description_for_label and use it to get rid of parentheses content for PF, TOV, etc
 
 def generate_data(home, away, row_set, stat):
 	graph_data = _init_config_json()

@@ -109,7 +109,7 @@ def _init_dataset_json(item):
     name = item.replace("sharedlast", "").replace("(team)", "").strip()
     return {"label": name, "data": [{"x": "00:00", "y": 0, "label": "Start of game"}], "fill": False}
 
-# TODO HIGH PRIORITY - Else case should return everything except first object in array, not just last object in array (Eg. Glenn Robinson III -> Robinson III not just Robinson)
+
 def _prepare_player_name(player):
     # If it's the whole team, leave it untouched
     if "(team)" in player:
@@ -119,6 +119,10 @@ def _prepare_player_name(player):
         return player.split(" ")[0].replace("sharedlast", "")[0] + ". " + player.split(" ")[-1]
     else:
         return " ".join(player.split(" ")[1:])
+
+
+def _prepare_description_for_label(description):
+	pass
 
 
 def _convert_pctime_to_timestamp(quarter, play_clock_time):
@@ -136,10 +140,12 @@ def _convert_pctime_to_timestamp(quarter, play_clock_time):
 def _get_game_length_as_string(quarter):
     return "48:00" if quarter == 4 else str(48 + ((quarter - 4) * 5)) + ":00"
 
+
 def _get_keywords_for_stat(stat):
     if stat == 'PTS':
         return ["Shot", "shot", "Layup", "layup", "Free", "free", "Dunk", "dunk", "Jumper", "jumper"]
     return []
+
 
 def _row_contains_stat_data(row, stat):
 	if stat == 'PTS':
@@ -152,19 +158,20 @@ def _row_contains_stat_data(row, stat):
 		return 'STEAL' in row
 	elif stat == 'BLK':
 		return 'BLOCK' in row
+	elif stat == 'PF':
+		return " Foul " in row or ".FOUL" in row
+	elif stat == 'TOV':
+		return "Turnover" in row
 	return False
+
 
 def _period_as_string(period):
     return 'Q' + str(period) if period <= 4 else 'OT' + str(period - 4)
 
+
 def _get_desc_index(roster, stat):
 	return _HOME_DESCRIPTION if roster == 'HOME' else _AWAY_DESCRIPTION
-	'''
-	if roster == 'HOME':
-		return _HOME_DESCRIPTION if stat not in ['STL', 'BLK'] else _AWAY_DESCRIPTION
-	else:
-		return _AWAY_DESCRIPTION if stat not in ['STL', 'BLK'] else _HOME_DESCRIPTION
-	'''
+
 
 def _extract_stat_for_whole_team(stat, row, description, current_value):
 	if stat == 'PTS':
@@ -172,19 +179,12 @@ def _extract_stat_for_whole_team(stat, row, description, current_value):
 			return int(row[_SCORE].split(" - ")[1])
 		else:
 			return current_value
-	elif stat == 'AST':
+	elif stat in ['AST', 'STL', 'BLK', 'PF', 'TOV', 'TREB']:
 		return current_value + 1
-	elif stat == 'OREB':
+	elif stat in ['OREB', 'DREB']:
 		return 0
-	elif stat == 'DREB':
-		return 0
-	elif stat == 'TREB':
-		return current_value + 1
-	elif stat == 'STL':
-		return current_value + 1
-	elif stat == 'BLK':
-		return current_value + 1
 	return 0
+
 
 def _extract_stat_for_player(stat, description, current_value):
 	if stat == 'PTS':
@@ -192,31 +192,20 @@ def _extract_stat_for_player(stat, description, current_value):
 			return int(re.search("\((.+?) PTS", description).group(1))
 		else:
 			return current_value
-	elif stat == 'AST':
+	elif stat in ['AST', 'STL', 'BLK', 'PF', 'TOV', 'TREB']:
 		return current_value + 1
 	elif stat == 'OREB':
 		return int(re.search("\Off:(.+?)", description).group(1))
 	elif stat == 'DREB':
 		return int(re.search("\Def:(.+?)", description).group(1))
-	elif stat == 'TREB':
-		return current_value + 1
-	elif stat == 'STL':
-		return current_value + 1
-		#return int(re.search("Steal\:.*\((.+?) ST\)", description).group(1))
-	elif stat == 'BLK':
-		return current_value + 1
-		#return int(re.search("Missed Block\:.*\((.+?) BLK\)", description).group(1))
 	return 0
+
 
 def _stat_pertains_to_player(stat, pbp_name, desc):
 	if stat == 'PTS':
 		return pbp_name in desc and not ("(" + pbp_name) in desc
 	elif stat == 'AST':
 		return ('(' + pbp_name) in desc
-	elif 'REB' in stat:
-		return pbp_name in desc
-	elif stat == 'STL':
-		return pbp_name in desc
-	elif stat == 'BLK':
+	elif stat in ['OREB', 'DREB', 'TREB', 'STL', 'BLK', 'PF', 'TOV']:
 		return pbp_name in desc
 	return False

@@ -65,6 +65,8 @@ def generate_graph_data(gameid, stat, type, home, away):
 		return jsonify(generate_data(home, away, row_set, 'STL'))
 	elif stat == 'BLK':
 		return jsonify(generate_data(home, away, row_set, 'BLK'))
+	elif stat == 'PF':
+		return jsonify(generate_data(home, away, row_set, 'PF'))
 	return 'Magical edge case that should never be reached ' + stat
 
 

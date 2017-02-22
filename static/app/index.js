@@ -106,13 +106,13 @@ app.controller("mainController", function($scope, $http, $timeout) {
 		alert("Please choose at most 4 players to graph. Sorry for now.");
 		else
 		{
-			var homePlayers = "NOPLAYERS";
+			var homePlayers = [];
 			if(chosenPlayersHome.length != 0)
 			{
 				homePlayers = identifySharedLast(chosenPlayersHome.slice(0), Object.keys($scope.homeRoster));
 			}
 
-			var awayPlayers = "NOPLAYERS";
+			var awayPlayers = [];
 			if(chosenPlayersAway.length != 0)
 			{
 				awayPlayers = identifySharedLast(chosenPlayersAway.slice(0), Object.keys($scope.awayRoster));

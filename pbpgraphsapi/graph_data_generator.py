@@ -7,7 +7,6 @@ _AWAY_DESCRIPTION = 9
 _PERIOD = 4
 _PLAY_CLOCK = 6
 _SCORE = 10
-_NOPLAYERS = 'NOPLAYERS'
 
 # TODO LOW PRIORITY - Consider adding an option to look at data quarter by quarter (As in select one quarter and make the start of the quarter 0,0)
 # TODO LOW PRIORITY - Add datapoints for sub-ins and sub-outs
@@ -27,31 +26,30 @@ def generate_data(home, away, row_set, stat):
 def _generate_data_for_roster(roster_type, roster, data, stat):
 	datasets = []
 	desc_loc = _get_desc_index(roster_type, stat)
-	if not _NOPLAYERS in roster:
-		for item in roster:
-			print item
-			whole_team = ("(team" in item)
-			pbp_name = _prepare_player_name(item)
-			print pbp_name
-			dataset = _init_dataset_json(item)
-			value = 0
-			for row in data:
-				desc = row[desc_loc]
-				print desc
-				if desc and _row_contains_stat_data(desc, stat):
-					if whole_team or _stat_pertains_to_player(stat, pbp_name, desc):
-						if whole_team:
-							value = _extract_stat_for_whole_team(stat, row, desc, value)
-						else:
-							value = _extract_stat_for_player(stat, desc, value)
-						time = _convert_pctime_to_timestamp(row[_PERIOD], row[_PLAY_CLOCK])
-						label = ["Q" + str(row[_PERIOD]) + ", " + str(row[_PLAY_CLOCK]) + "  --  " + str(value) + " " + stat, desc]
-						dataset["data"].append({"x": time, "y": value, "label": label})
-			if data[-1][_PLAY_CLOCK] == "0:00":
-				final_label = "Final total: " + str(value) + " " + stat
-				print final_label
-				dataset["data"].append({"x": _get_game_length_as_string(data[-1][_PERIOD]), "y": value, "label": final_label})
-				datasets.append(dataset)
+	for item in roster:
+		print item
+		whole_team = ("(team" in item)
+		pbp_name = _prepare_player_name(item)
+		print pbp_name
+		dataset = _init_dataset_json(item)
+		value = 0
+		for row in data:
+			desc = row[desc_loc]
+			print desc
+			if desc and _row_contains_stat_data(desc, stat):
+				if whole_team or _stat_pertains_to_player(stat, pbp_name, desc):
+					if whole_team:
+						value = _extract_stat_for_whole_team(stat, row, desc, value)
+					else:
+						value = _extract_stat_for_player(stat, desc, value)
+					time = _convert_pctime_to_timestamp(row[_PERIOD], row[_PLAY_CLOCK])
+					label = ["Q" + str(row[_PERIOD]) + ", " + str(row[_PLAY_CLOCK]) + "  --  " + str(value) + " " + stat, desc]
+					dataset["data"].append({"x": time, "y": value, "label": label})
+		if data[-1][_PLAY_CLOCK] == "0:00":
+			final_label = "Final total: " + str(value) + " " + stat
+			print final_label
+			dataset["data"].append({"x": _get_game_length_as_string(data[-1][_PERIOD]), "y": value, "label": final_label})
+			datasets.append(dataset)
 	return datasets
 
 

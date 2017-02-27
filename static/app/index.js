@@ -44,6 +44,7 @@ app.controller("mainController", function($scope, $http, $timeout) {
 	//Load the checklists which contain all the players playing in the game, so user can selecte players to graph
 	$scope.loadChecklists = function(game)
 	{
+		console.log(game);
 		//Need to reset these every time a new game is selected
 		$scope.selectedPlayersHome = [];
 		$scope.selectedPlayersAway = [];

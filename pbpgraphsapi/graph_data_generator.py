@@ -35,8 +35,8 @@ def _generate_data_for_roster(roster_type, roster, data, stat):
 		value = 0
 		for row in data:
 			desc = row[desc_loc]
-			print desc
 			if desc and _row_contains_stat_data(desc, stat):
+				print desc
 				if whole_team or _stat_pertains_to_player(stat, pbp_name, desc):
 					if whole_team:
 						value = _extract_stat_for_whole_team(stat, row, desc, value)

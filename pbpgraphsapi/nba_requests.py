@@ -74,11 +74,11 @@ def generate_graph_data(gameid, stat, type, home, away):
 
 # TODO HIGH PRIORITY - Check for return status codes here
 def _make_request(url):
-    headers = {'user-agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) '
-                              'AppleWebKit/537.36 (KHTML, like Gecko) '
-                              'Chrome/45.0.2454.101 Safari/537.36'),
-               'referer': 'http://stats.nba.com/scores/'
+    headers = {
+	    'user-agent': 'Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
+	    'origin': 'http://stats.nba.com'
     }
+	
     try:
         result = requests.get(url, headers=headers).json()
         # Return the relevant rows
